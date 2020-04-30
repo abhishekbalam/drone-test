@@ -10,5 +10,6 @@ steps:
   - sudo cp -R /drone ~ 
   - cat /home/frappe/site_configs/consumer_db/mariadb.json
   - cat ~/site_configs/consumer_db/mariadb.json
+  - cd ~
   - bench init --skip-assets --frappe-path ~/frappe --python $(which python3) frappe-bench
 
