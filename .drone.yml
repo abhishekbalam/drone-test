@@ -3,24 +3,39 @@ type: docker
 name: default
    
 workspace:
-  path: /home/frappe/erpnext
+  path: /home/frappe-user
+
+clone:
+  disable: true
 
 steps:
-- name: Setup Bench
-  image: abhishekbalam/test1
+- name: Setup
+  image: abhishekbalam/erpnext-testing
   pull: if-not-exists
   commands:
-    - cd ~; ls;
+    - git mv * ~/erpnext
     - git clone https://github.com/frappe/frappe --branch $DRONE_BRANCH --depth 1
+    - while ! mysqladmin ping -hdatabase --silent; do sleep 1; done
+    - mysql -u root -e "SET GLOBAL character_set_server = 'utf8mb4'"
+    - mysql -u root -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
+    - mysql -u root -e "CREATE DATABASE test_frappe"
+    - mysql -u root -e "CREATE USER 'test_frappe'@'localhost' IDENTIFIED BY 'test_frappe'"
+    - mysql -u root -e "GRANT ALL PRIVILEGES ON \`test_frappe\`.* TO 'test_frappe'@'localhost'"
+    - mysql -u root -e "UPDATE mysql.user SET Password=PASSWORD('travis') WHERE User='root'"
+    - mysql -u root -e "FLUSH PRIVILEGES"
+
+- name: Build
+  image: abhishekbalam/erpnext-testing
+  pull: if-not-exists
+  commands:
     - bench init --skip-assets  --frappe-path ~/frappe --python $(which python3) frappe-bench
     - mkdir ~/frappe-bench/sites/test_site
-    - wget -O ~/frappe-bench/sites/test_site/site_config.json https://github.com/frappe/erpnext/blob/develop/.travis/site_config.json
+    - cp ~/erpnext/.travis/site_config.json ~/frappe-bench/sites/test_site/
     - cd frappe-bench;ls
     - sed -i 's/watch:/# watch:/g' Procfile
     - sed -i 's/schedule:/# schedule:/g' Procfile
     - sed -i 's/socketio:/# socketio:/g' Procfile
     - sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
-    - echo $DRONE_DIR
     - bench get-app erpnext ~/erpnext
     - echo "here"
 
@@ -29,13 +44,4 @@ services:
     image: mariadb:10.3
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-    commands:
-      - while ! mysqladmin ping -hlocalhost --silent; do sleep 1; done
-      - mysql -u root -e "SET GLOBAL character_set_server = 'utf8mb4'"
-      - mysql -u root -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
-      - mysql -u root -e "CREATE DATABASE test_frappe"
-      - mysql -u root -e "CREATE USER 'test_frappe'@'localhost' IDENTIFIED BY 'test_frappe'"
-      - mysql -u root -e "GRANT ALL PRIVILEGES ON \`test_frappe\`.* TO 'test_frappe'@'localhost'"
-      - mysql -u root -e "UPDATE mysql.user SET Password=PASSWORD('travis') WHERE User='root'"
-      - mysql -u root -e "FLUSH PRIVILEGES"
 
