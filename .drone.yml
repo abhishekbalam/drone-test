@@ -6,6 +6,7 @@ steps:
 - name: test
   image: abhishekbalam/test1
   commands:
+  - whoami; pwd
   - cat /home/frappe/site_configs/consumer_db/mariadb.json
   - cat ~/site_configs/consumer_db/mariadb.json
   - bench init --skip-assets --frappe-path ~/frappe --python $(which python3) frappe-bench
