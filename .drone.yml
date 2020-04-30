@@ -15,7 +15,7 @@ steps:
   - mysql -u root -proot -h db -e 'SHOW DATABASES;'
 
 services:
-  db:
-    image: 'mariadb:10.3'
+  - name: database
+    image: mariadb:10.3
     environment:
       MYSQL_ROOT_PASSWORD: root
