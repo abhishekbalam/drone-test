@@ -11,7 +11,6 @@ steps:
   pull: if-not-exists
   commands:
   - whoami; pwd; ls
-  - sudo cp -R /drone ~ 
   - cat /home/frappe/site_configs/consumer_db/mariadb.json
   - cat ~/site_configs/consumer_db/mariadb.json
   - cd ~
