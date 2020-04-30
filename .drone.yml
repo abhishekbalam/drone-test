@@ -3,7 +3,7 @@ type: docker
 name: default
    
 workspace:
-  path: /home/frappe
+  path: /home/frappe/drone
 
 steps:
 - name: test
