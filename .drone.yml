@@ -10,12 +10,12 @@ steps:
   image: abhishekbalam/test1
   pull: if-not-exists
   commands:
-    - cd ~
+    - cd ~; ls;
     - git clone https://github.com/frappe/frappe --branch $DRONE_BRANCH --depth 1
     - bench init --skip-assets  --frappe-path ~/frappe --python $(which python3) frappe-bench
     - mkdir ~/frappe-bench/sites/test_site
     - wget -O ~/frappe-bench/sites/test_site/site_config.json https://github.com/frappe/erpnext/blob/develop/.travis/site_config.json
-    - cd frappe-bench
+    - cd frappe-bench;ls
     - sed -i 's/watch:/# watch:/g' Procfile
     - sed -i 's/schedule:/# schedule:/g' Procfile
     - sed -i 's/socketio:/# socketio:/g' Procfile
