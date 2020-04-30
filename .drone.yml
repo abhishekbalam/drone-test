@@ -2,9 +2,13 @@ kind: pipeline
 type: docker
 name: default
    
+workspace:
+  path: /home/frappe
+  
 steps:
 - name: test
   image: abhishekbalam/test1
+  pull: if-not-exists
   commands:
   - whoami; pwd
   - sudo cp -R /drone ~ 
