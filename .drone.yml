@@ -13,6 +13,7 @@ steps:
   - cd ~
   - bench init --skip-assets --python $(which python3) frappe-bench
   - mysql -u root -proot -h database -e 'SHOW DATABASES;'
+  - pwd  
 
 services:
   - name: database
