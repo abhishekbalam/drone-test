@@ -12,7 +12,7 @@ steps:
   - cat ~/site_configs/consumer_db/mariadb.json
   - cd ~
   - bench init --skip-assets --python $(which python3) frappe-bench
-  - mysql -u root -proot -h db -e 'SHOW DATABASES;'
+  - mysql -u root -proot -h database -e 'SHOW DATABASES;'
 
 services:
   - name: database
