@@ -12,4 +12,10 @@ steps:
   - cat ~/site_configs/consumer_db/mariadb.json
   - cd ~
   - bench init --skip-assets --python $(which python3) frappe-bench
+  - mysql -u root -proot -h db -e 'SHOW DATABASES;'
 
+services:
+  db:
+    image: mariadb:10.3
+    environment:
+      MYSQL_ROOT_PASSWORD: root
