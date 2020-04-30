@@ -3,23 +3,38 @@ type: docker
 name: default
    
 workspace:
-  path: /home/frappe/drone
+  path: /home/frappe/erpnext
 
 steps:
-- name: test
+- name: Setup Bench
   image: abhishekbalam/test1
   pull: if-not-exists
   commands:
-  - whoami; pwd; ls
-  - cat /home/frappe/site_configs/consumer_db/mariadb.json
-  - cat ~/site_configs/consumer_db/mariadb.json
-  - cd ~
-  - bench init --skip-assets --python $(which python3) frappe-bench
-  - mkdir ~/frappe-bench/sites/test_site  
-  - echo $DRONE_BRANCH
+    - cd ~
+    - git clone https://github.com/frappe/frappe --branch $DRONE_BRANCH --depth 1
+    - bench init --skip-assets  --frappe-path ~/frappe --python $(which python3) frappe-bench
+    - mkdir ~/frappe-bench/sites/test_site
+    - wget -O ~/frappe-bench/sites/test_site https://github.com/frappe/erpnext/blob/develop/.travis/site_config.json
+    - cd frappe-bench
+    - sed -i 's/watch:/# watch:/g' Procfile
+    - sed -i 's/schedule:/# schedule:/g' Procfile
+    - sed -i 's/socketio:/# socketio:/g' Procfile
+    - sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
+    - echo $DRONE_DIR
+    - bench get-app erpnext ~/erpnext
+    - while ! mysqladmin ping -hdatabase --silent; do sleep 1; done
+    - echo "here"
 
 services:
   - name: database
     image: mariadb:10.3
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    commands:
+      - mysql -u root -e "SET GLOBAL character_set_server = 'utf8mb4'"
+      - mysql -u root -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
+      - mysql -u root -e "CREATE DATABASE test_frappe"
+      - mysql -u root -e "CREATE USER 'test_frappe'@'localhost' IDENTIFIED BY 'test_frappe'"
+      - mysql -u root -e "GRANT ALL PRIVILEGES ON \`test_frappe\`.* TO 'test_frappe'@'localhost'"
+      - mysql -u root -e "UPDATE mysql.user SET Password=PASSWORD('travis') WHERE User='root'"
+      - mysql -u root -e "FLUSH PRIVILEGES"

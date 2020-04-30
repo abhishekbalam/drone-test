@@ -2,8 +2,6 @@ FROM ubuntu:bionic
 
 MAINTAINER Abhishek Balam <abhishek@frappe.io>
 
-ENV MYSQL_ROOT_PASSWORD=root
-
 # Basic Requirements
 RUN apt update && apt -y upgrade && \
 	apt -y install git vim curl sudo wget \
@@ -15,8 +13,8 @@ RUN apt update && apt -y upgrade && \
 RUN apt -y install locales
 
 # Nonroot Sudo User
-RUN adduser --disabled-password --gecos '' frappe
-RUN adduser frappe sudo
+RUN adduser --disabled-password --gecos '' frappe-user
+RUN adduser frappe-user sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 # Nodejs 
@@ -37,26 +35,11 @@ RUN pip3 install coverage==4.5.4 python-coveralls
 ENV LC_ALL=C.UTF-8 
 ENV LANG=C.UTF-8
 
-USER frappe
+USER frappe-user
 
-WORKDIR /home/frappe
-
-# For Event Streaming
-RUN mkdir -p site_configs
-
-RUN wget "https://raw.githubusercontent.com/abhishekbalam/frappe/develop/.travis/consumer_db/mariadb.json" -P /home/frappe/site_configs/consumer_db/ && \
-	wget "https://raw.githubusercontent.com/abhishekbalam/frappe/develop/.travis/consumer_db/postgres.json" -P /home/frappe/site_configs/consumer_db/
-RUN wget "https://raw.githubusercontent.com/abhishekbalam/frappe/develop/.travis/producer_db/mariadb.json" -P /home/frappe/site_configs/producer_db/ && \
-	wget "https://raw.githubusercontent.com/abhishekbalam/frappe/develop/.travis/producer_db/postgres.json" -P /home/frappe/site_configs/producer_db/
-
+WORKDIR /home/frappe-user
 
 # Bench Install
 RUN git clone https://github.com/frappe/bench --depth 1
 RUN pip3 install -e ./bench
-
-RUN sudo cp /home/frappe/.local/bin/bench /usr/bin
-
-# Bench Init
-# RUN bench init frappe-bench --skip-assets --python $(which python3) 
-# RUN echo '"db_host": "127.0.0.1"' >> sites/common_site_config.json
-# RUN sed -i 's/watch:/# watch:/g' Procfile && sed -i 's/schedule:/# schedule:/g' Procfile
+RUN sudo cp /home/frappe-user/.local/bin/bench /usr/bin
