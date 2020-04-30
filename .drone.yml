@@ -4,13 +4,13 @@ name: default
    
 workspace:
   path: /home/frappe
-  
+
 steps:
 - name: test
   image: abhishekbalam/test1
   pull: if-not-exists
   commands:
-  - whoami; pwd
+  - whoami; pwd; ls
   - sudo cp -R /drone ~ 
   - cat /home/frappe/site_configs/consumer_db/mariadb.json
   - cat ~/site_configs/consumer_db/mariadb.json
