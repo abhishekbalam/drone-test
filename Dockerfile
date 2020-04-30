@@ -43,6 +43,7 @@ WORKDIR /home/frappe
 
 # For Event Streaming
 RUN mkdir -p site_configs
+
 RUN wget "https://raw.githubusercontent.com/abhishekbalam/frappe/develop/.travis/consumer_db/mariadb.json" -P /home/frappe/site_configs/consumer_db/ && \
 	wget "https://raw.githubusercontent.com/abhishekbalam/frappe/develop/.travis/consumer_db/postgres.json" -P /home/frappe/site_configs/consumer_db/
 RUN wget "https://raw.githubusercontent.com/abhishekbalam/frappe/develop/.travis/producer_db/mariadb.json" -P /home/frappe/site_configs/producer_db/ && \
