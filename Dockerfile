@@ -41,7 +41,5 @@ WORKDIR /home/frappe-user
 
 # Bench Install
 #RUN git clone https://github.com/frappe/bench --depth 1
-#RUN pip3 install -e ./bench
-#RUN sudo cp /home/frappe-user/.local/bin/bench /usr/bin
-
 RUN pip3 install frappe-bench
+RUN sudo cp /home/frappe-user/.local/bin/bench /usr/bin
