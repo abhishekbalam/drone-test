@@ -14,6 +14,7 @@ steps:
   pull: if-not-exists
   commands:
     - echo "here"
+    - mv * ~/erpnext
     - git clone https://github.com/frappe/frappe --branch $DRONE_BRANCH --depth 1
     - while ! mysqladmin ping -hdatabase --silent; do sleep 1; done
     - mysql -u root -h database -e "SET GLOBAL character_set_server = 'utf8mb4'"
@@ -30,6 +31,7 @@ steps:
   commands:
     - bench init --skip-assets  --frappe-path ~/frappe --python $(which python3) frappe-bench
     - mkdir ~/frappe-bench/sites/test_site
+    - sudo -H pip3 install honcho
     - cp ~/erpnext/.travis/site_config.json ~/frappe-bench/sites/test_site/
     - cd frappe-bench;ls
     - sed -i 's/redis_cache:/# redis_cache:/g' Procfile
