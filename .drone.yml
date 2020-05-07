@@ -13,7 +13,6 @@ steps:
   image: abhishekbalam/erpnext-testing
   pull: if-not-exists
   commands:
-    - git mv * ~/erpnext
     - git clone https://github.com/frappe/frappe --branch $DRONE_BRANCH --depth 1
     - while ! mysqladmin ping -hdatabase --silent; do sleep 1; done
     - mysql -u root -e "SET GLOBAL character_set_server = 'utf8mb4'"
@@ -38,9 +37,11 @@ steps:
     - sed -i 's/schedule:/# schedule:/g' Procfile
     - sed -i 's/socketio:/# socketio:/g' Procfile
     - sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
-    - bench get-app erpnext ~/erpnext
+    - bench get-app erpnext 
     - echo "here"
-
+    - bench start &
+    - bench --site test_site reinstall --yes
+    
 services:
   - name: database
     image: mariadb:10.3
