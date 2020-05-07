@@ -13,6 +13,7 @@ steps:
   image: abhishekbalam/erpnext-testing
   pull: if-not-exists
   commands:
+    - echo "here"
     - git clone https://github.com/frappe/frappe --branch $DRONE_BRANCH --depth 1
     - while ! mysqladmin ping -hdatabase --silent; do sleep 1; done
     - mysql -u root -e "SET GLOBAL character_set_server = 'utf8mb4'"
@@ -41,7 +42,7 @@ steps:
     - echo "here"
     - bench start &
     - bench --site test_site reinstall --yes
-    
+
 services:
   - name: database
     image: mariadb:10.3
